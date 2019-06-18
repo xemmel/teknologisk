@@ -108,3 +108,14 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 
 ```
+
+### XML INPUT SAMPLE
+
+```xml
+
+<Order>
+	<ID>17</ID>
+	<Item>Book</Item>
+</Order>
+
+```
