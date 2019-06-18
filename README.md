@@ -83,3 +83,28 @@ Execute:
 $deploy_output = New-AzResourceGroupDeployment -ResourceGroupName teknologisk -TemplateFile C:\ARMS\Create_Simple_LogicApp.json -logicAppName template1 -responseMessage "Yes It's working"
 
 ```
+
+## XSLT Sample
+
+```xml
+<xsl:stylesheet version="1.0"
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+<xsl:template match="Order">
+  <MyOrder>
+	<OrderId>
+		<xsl:value-of select="ID" />
+	</OrderId>
+	<ItemNo>
+		<xsl:value-of select="Item" />
+	</ItemNo>
+	<Customer>
+		<xsl:text>Coop</xsl:text>
+	</Customer>
+  </MyOrder>
+</xsl:template>
+
+</xsl:stylesheet>
+
+
+```
