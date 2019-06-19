@@ -2,10 +2,10 @@
 
 ## Table of Content
 
-1.[Logic App Arm Template](#logic-app-arm-template)
-1.[Split On](#split-on)
-1.[Storage upload](#storage-upload)
-1.[Storage Event Grid](#storage-event-grid)
+1. [Logic App Arm Template](#logic-app-arm-template)
+1. [Split On](#split-on)
+1. [Storage upload](#storage-upload)
+1. [Storage Event Grid](#storage-event-grid)
 
 
 
