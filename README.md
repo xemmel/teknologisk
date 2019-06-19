@@ -284,4 +284,77 @@ $storage | Get-AzStorageContainer -Name tofunction | Get-AzStorageBlob | select 
 
 ```
 
+
+## Event Grid Topic
+
+```powershell
+
+##
+
+# TOPIC (Submitte events)
+
+# Subscriptions (Hook on to Topic and subscribe -> WebHook)
+
+$rg = New-AzResourceGroup -Name eventgrid1 -Location 'West Europe'
+
+
+
+$eventtopic = New-AzEventGridTopic -ResourceGroupName $rg.ResourceGroupName -Name dtitopic -Location $rg.Location
+
+$key = $eventtopic | Get-AzEventGridTopicKey | select -ExpandProperty Key1
+
+$eventtopic.Endpoint
+$key
+
+
+
+$endpoint = "https://enenzfrg0eyo.x.pipedream.net/";
+New-AzEventGridSubscription -ResourceGroupName $rg.ResourceGroupName -TopicName $eventtopic.TopicName -EventSubscriptionName everythingtorequestbin -Endpoint $endpoint
+
+
+$endpoint = "https://enl3xauzjznna.x.pipedream.net/";
+
+New-AzEventGridSubscription -ResourceGroupName $rg.ResourceGroupName -TopicName $eventtopic.TopicName -EventSubscriptionName onlyordertorequestbin -Endpoint $endpoint -SubjectBeginsWith 'invoice'
+
+$eventtopic | Get-AzEventGridSubscription | select EventSubscriptionName, Topic
+
+```
+
+EXECUTE TOPIC EVENT
+
+```powershell
+
+Clear-Host
+$body = @'
+[
+{
+    "id" : "17",
+    "subject" : "order",
+    "eventType" : "orderCreated",
+    "eventTime" : "2019-06-19T12:00:00.0000Z",
+    "data" : {
+        "customer" : "Dallas"    
+    
+    }
+}
+,
+
+{
+    "id" : "18",
+    "subject" : "invoice",
+    "eventType" : "orderCreated",
+    "eventTime" : "2019-06-19T12:00:00.0000Z",
+    "data" : {
+        "customer" : "Washington"
+    }
+}
+]
+'@
+
+curl -Uri $eventtopic.Endpoint -Method Post -Body $body -ContentType "application/json" -Headers @{"aeg-sas-key" = $key}
+
+
+
+```
+
 [Back to top](#table-of-content)
