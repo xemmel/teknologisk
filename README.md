@@ -1,5 +1,7 @@
 # teknologisk
 
+## Table of Content
+
 
 ## Logic App Arm Template
 
@@ -117,5 +119,70 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<ID>17</ID>
 	<Item>Book</Item>
 </Order>
+
+```
+
+
+### Create Logic App from Powershell
+
+```powershell
+
+Clear-Host
+$workflowName = "MapXSLT"
+$map_name = "xsltmap";
+
+Remove-AzLogicApp -ResourceGroupName $rg_wfmap.ResourceGroupName -Name $workflowName -Force
+$defintion = @'
+{
+    "$schema" : "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json",
+    "contentVersion": "1.0.0.0",
+    "triggers" : {
+        "httpTrigger" : {
+            "inputs" : {
+                "schema" : {},
+                "method" : "Post"
+            },
+            "type" : "Request",
+            "kind" : "Http"
+        }
+    },
+    "actions" : {
+        "Transform" : {
+            "inputs" : {
+                "content" : "@triggerBody()",
+                "integrationAccount": {
+                    "map" : {
+                        "name" : "xsltmap"
+                    }
+                }
+            },
+            "type" : "Xslt",
+            "runAfter" : {}
+        },
+        "Response" : {
+            "inputs" : {
+                "body" : "@outputs('Transform')['body']",
+                statuscode: 200
+            },
+            "type" : "Response",
+            "kind" : "Http",
+            "runAfter" : {
+                "Transform" : ["Succeeded"]   
+            }
+            
+        }
+    },
+    "outputs" : {
+    
+    },
+    "parameters": {
+    
+    }
+}
+'@
+
+New-AzLogicApp -ResourceGroupName $rg_wfmap.ResourceGroupName -Name $workflowName -Location $ia.Location `
+    -Definition $defintion -IntegrationAccountId $ia.Id
+
 
 ```
