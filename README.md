@@ -260,3 +260,28 @@ curl -Uri $url -Method Post -Body $body -ContentType "application/json"
 Remove-AzResourceGroup -Name $rg.ResourceGroupName -Force 
 
 ```
+
+### Storage upload
+
+```powershell
+
+$storage = Get-AzStorageAccount -ResourceGroupName teknologisk -Name teknologiskpre
+
+
+
+$storage | Get-AzStorageContainer -Name fromfunction | Get-AzStorageBlob | Remove-AzStorageBlob -Force
+
+## Upload files
+
+$storage | Get-AzStorageContainer -Name tofunction | Set-AzStorageBlobContent -File C:\temp\Blobupload\File1.txt -Force
+
+
+## List Containers
+
+$storage | Get-AzStorageContainer -Name fromfunction | Get-AzStorageBlob | select Name, Length
+
+$storage | Get-AzStorageContainer -Name tofunction | Get-AzStorageBlob | select Name
+
+```
+
+[Back to top](#table-of-content)
