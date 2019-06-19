@@ -2,6 +2,12 @@
 
 ## Table of Content
 
+1.[Logic App Arm Template](#logic-app-arm-template)
+1.[Split On](#split-on)
+1.[Storage upload](#storage-upload)
+1.[Storage Event Grid](#storage-event-grid)
+
+
 
 ## Logic App Arm Template
 
@@ -188,6 +194,8 @@ New-AzLogicApp -ResourceGroupName $rg_wfmap.ResourceGroupName -Name $workflowNam
 ```
 
 
+[Back to top](#table-of-content)
+
 ## Split On
 
 POWERSHELL ISE
@@ -261,6 +269,8 @@ Remove-AzResourceGroup -Name $rg.ResourceGroupName -Force
 
 ```
 
+[Back to top](#table-of-content)
+
 ### Storage upload
 
 ```powershell
@@ -284,6 +294,7 @@ $storage | Get-AzStorageContainer -Name tofunction | Get-AzStorageBlob | select 
 
 ```
 
+[Back to top](#table-of-content)
 
 ## Event Grid Topic
 
@@ -319,6 +330,7 @@ New-AzEventGridSubscription -ResourceGroupName $rg.ResourceGroupName -TopicName 
 $eventtopic | Get-AzEventGridSubscription | select EventSubscriptionName, Topic
 
 ```
+
 
 EXECUTE TOPIC EVENT
 
@@ -356,6 +368,8 @@ curl -Uri $eventtopic.Endpoint -Method Post -Body $body -ContentType "applicatio
 
 
 ```
+
+[Back to top](#table-of-content)
 
 ## Storage Event Grid
 
