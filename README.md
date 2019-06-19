@@ -6,7 +6,7 @@
 1. [Split On](#split-on)
 1. [Storage upload](#storage-upload)
 1. [Storage Event Grid](#storage-event-grid)
-
+1. [Hybrid C# Sample](#hybrid-c#-sample)
 
 
 ## Logic App Arm Template
@@ -434,4 +434,103 @@ New-AzEventGridSubscription -ResourceId $storage.Id -EventSubscriptionName stora
                 "type": "Compose"
             }
 ```
+[Back to top](#table-of-content)
+
+
+## Hybrid C# Sample
+
+```csharp
+
+using Microsoft.Azure.Relay;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HybridService
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            try
+            {
+
+                MainASync(args).GetAwaiter().GetResult();
+
+
+                
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        static void SomebodyCalled(RelayedHttpListenerContext context)
+        {
+            StreamReader sr = new StreamReader(context.Request.InputStream);
+            string filePath = sr.ReadToEnd();
+            Console.WriteLine($"Somebody called, with the following command: {filePath}");
+
+            var files = Directory.GetFiles(filePath);
+            List<object> resultList = new List<object>();
+            foreach(string file in files)
+            {
+                resultList.Add(new { file = file });
+            }
+
+            var resultObject = resultList.ToArray();
+
+            var json = JsonConvert.SerializeObject(resultObject, Formatting.Indented);
+            context.Response.Headers.Add("content-type", "application/json");
+            using(var sw = new StreamWriter(context.Response.OutputStream))
+            {
+                sw.WriteLine(json);
+            }
+
+            context.Response.Close();
+        }
+
+        static async Task MainASync(string[] args)
+        {
+            var listener = GetListener();
+            listener.Connecting += (o, e) => { Console.WriteLine("Connecting.."); };
+            listener.Online += (o, e) => { Console.WriteLine("Online"); };
+
+            listener.RequestHandler = SomebodyCalled;
+
+            await listener.OpenAsync();
+
+            await Console.In.ReadLineAsync();
+        }
+
+        static HybridConnectionListener GetListener()
+        {
+            string ns = "teknologisk.servicebus.windows.net";
+            string hc = "test";
+
+            var listener = new HybridConnectionListener
+                (new Uri(String.Format("sb://{0}/{1}", ns, hc)),
+                GetTokenProvider());
+            return listener;
+        }
+
+        static TokenProvider GetTokenProvider()
+        {
+            string kn = "thelistener";
+            string k = "AwRTJ7Mtwm7V+reUgMugfl9pgiggE3/8zpqjUPd8r/I=";
+            var result = TokenProvider.CreateSharedAccessSignatureTokenProvider(kn, k);
+            return result;
+        }
+    }
+}
+
+
+```
+
 [Back to top](#table-of-content)
