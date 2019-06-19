@@ -357,4 +357,67 @@ curl -Uri $eventtopic.Endpoint -Method Post -Body $body -ContentType "applicatio
 
 ```
 
+## Storage Event Grid
+
+```powershell
+
+$rg = New-AzResourceGroup -Name storageevents -Location westeurope
+
+
+$storage = New-AzStorageAccount -ResourceGroupName $rg.ResourceGroupName `
+    -Name eventgridstorage1239 -SkuName Standard_LRS -Location $rg.Location `
+    -Kind StorageV2 -AccessTier Hot
+
+
+$storage | Get-AzStorageContainer -Name onramp | Get-AzStorageBlob
+
+$storage | Get-AzStorageContainer -Name msgbox | Get-AzStorageBlob
+
+
+
+##Upload files
+
+Get-ChildItem -Path C:\Temp\Blobupload | 
+    foreach{ $storage | Get-AzStorageContainer -Name onramp | 
+    Set-AzStorageBlobContent -File $_.FullName -Force }
+
+
+##Remove all files
+
+$storage | Get-AzStorageContainer -Name onramp | Get-AzStorageBlob | 
+Remove-AzStorageBlob -Force
+
+# $storage | New-AzStorageContainer -Name onramp
+
+
+## Create Storage Event Subscription
+$endpoint = "https://prod-40.westeurope.logic.azure.com:443/workflows/7ecc23a5225744118a451b8c772234c9/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IsUPSnZIaq06yos-RqnOLQqu62Tv0KXYrZojk-L6JbI";
+
+$storage.Id
+
+New-AzEventGridSubscription -ResourceId $storage.Id -EventSubscriptionName storage2requestbin `
+    -Endpoint $endpoint -IncludedEventType "Microsoft.Storage.BlobCreated" `
+    -SubjectBeginsWith "/blobServices/default/containers/onramp"
+
+
+```
+
+## Compose get container and name from subject
+
+```json
+"ComposeBlobName": {
+                "inputs": "@split(triggerBody()['subject'],'/')[6]",
+                "runAfter": {
+                    "ComposeBlobPath": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Compose"
+            },
+            "ComposeBlobPath": {
+                "inputs": "@split(triggerBody()['subject'],'/')[4]",
+                "runAfter": {},
+                "type": "Compose"
+            }
+```
 [Back to top](#table-of-content)
