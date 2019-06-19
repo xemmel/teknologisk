@@ -6,7 +6,7 @@
 1. [Split On](#split-on)
 1. [Storage upload](#storage-upload)
 1. [Storage Event Grid](#storage-event-grid)
-1. [Hybrid C# Sample](#hybrid-c#-sample)
+1. [Hybrid Sample](#hybrid-sample)
 
 
 ## Logic App Arm Template
@@ -437,7 +437,7 @@ New-AzEventGridSubscription -ResourceId $storage.Id -EventSubscriptionName stora
 [Back to top](#table-of-content)
 
 
-## Hybrid C# Sample
+## Hybrid Sample
 
 ```csharp
 
