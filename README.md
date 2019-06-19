@@ -186,3 +186,77 @@ New-AzLogicApp -ResourceGroupName $rg_wfmap.ResourceGroupName -Name $workflowNam
 
 
 ```
+
+
+## Split On
+
+POWERSHELL ISE
+
+```powershell
+
+## Create Resource Group
+Clear-Host
+$rg = New-AzResourceGroup -Name splitit -Location westeurope
+
+
+
+## Create Workflow (LA)
+Clear-Host
+$workflowName = "SplitIt";
+Remove-AzLogicApp -ResourceGroupName $rg.ResourceGroupName -Name $workflowName -Force
+$defintion = @'
+{
+    "$schema" : "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json",
+    "contentVersion": "1.0.0.0",
+    "triggers" : {
+        "httpTrigger" : {
+            "inputs" : {
+                "schema" : {},
+                "method" : "Post"
+            },
+            "type" : "Request",
+            "splitOn" : "@triggerBody()",
+            "kind" : "Http"
+        }
+    },
+    "actions" : {
+        "Compose" : {
+            "inputs" : "@triggerBody()",
+            "type" : "Compose",
+            "runAfter" : {
+                
+            }
+            
+        }
+    },
+    "outputs" : {
+    
+    },
+    "parameters": {
+    
+    }
+}
+'@
+
+$la = New-AzLogicApp -ResourceGroupName $rg.ResourceGroupName -Name $workflowName -Location $rg.Location `
+    -Definition $defintion
+
+$url = Get-AzLogicAppTriggerCallbackUrl -ResourceGroupName $rg.ResourceGroupName `
+     -Name $workflowName -TriggerName httpTrigger | select -ExpandProperty Value
+
+## Call Workflow (LA)
+Clear-Host
+$body = @'
+[
+{ "name" : "Morten"},
+{ "name" : "la Cour"}
+
+]
+'@
+
+curl -Uri $url -Method Post -Body $body -ContentType "application/json"
+
+## Clean Up
+Remove-AzResourceGroup -Name $rg.ResourceGroupName -Force 
+
+```
