@@ -9,6 +9,21 @@
 1. [Hybrid Sample](#hybrid-sample)
 
 
+## RUN ARM in Powershell
+
+```powershell
+
+clear-host
+$parameterFiles = Get-ChildItem -Path C:\temp\arms\parameters;
+
+foreach($parameterFile in $parameterFiles) {
+
+New-AzResourceGroupDeployment -ResourceGroupName armdemo -TemplateFile C:\temp\arms\httplogicapp.json -Verbose `
+    -TemplateParameterFile $parameterFile.FullName;
+}
+
+```
+
 ## Logic App Arm Template
 
 ```json
